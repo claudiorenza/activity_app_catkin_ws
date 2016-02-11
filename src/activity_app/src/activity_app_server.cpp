@@ -14,11 +14,15 @@
 #include <netinet/in.h>
 #include <netdb.h> 
 
-int counter_entry = 0;
+//int counter_entry = 0;
 bool lampOne = false;
 bool lampTwo = false;
+bool tv = false;
 
-bool switchLamp(bool to_turn_on, char *host)    {
+
+bool switchLamp(bool toTurnOn, char *host)    {
+    printf("CONNECTING %s\n", host);
+    
     int sockfd, portno, n;
 
     struct sockaddr_in serv_addr;
@@ -47,12 +51,12 @@ bool switchLamp(bool to_turn_on, char *host)    {
     
     
     
-    if(to_turn_on)  {
+    if(toTurnOn)  {
         n = write(sockfd,"1",1);
-        ROS_INFO("[SWITCH] The lamp is going ON!");
+        //ROS_INFO("[SWITCH] The lamp is going ON!");
     } else  {
         n = write(sockfd,"0",1);
-        ROS_INFO("[SWITCH] The lamp is going OFF!");
+        //ROS_INFO("[SWITCH] The lamp is going OFF!");
     }
     if (n < 0) 
          perror("ERROR writing to socket");
@@ -61,39 +65,55 @@ bool switchLamp(bool to_turn_on, char *host)    {
     n = read(sockfd,buffer,255);
     if (n < 0) 
          perror("ERROR reading from socket");
-    printf("%s\n",buffer);
+    //printf("%s\n",buffer);
+    
     
     n = close(sockfd);
     
-    return to_turn_on;
+    if(buffer[0] == '0')  {
+      return 0;
+    }
+    
+    return 1;
 }
 
 void deviceCallback(const std_msgs::String::ConstPtr& msg) {
   char lampOneHost[] = "143.225.85.168";
   char lampTwoHost[] = "143.225.85.169";
+  //char tvHost[] = "143.225.85.170";
   
   if(msg->data.c_str()[0] == '1')	{   //entrata del client nell'area Beacon
-      ROS_INFO("Device Entered\n");
-      counter_entry++;
-      if(counter_entry > 0 && !lampOne)    {  //se è entrato il primo client nell'area Beacon, accendo la lampada
-          printf("[SERVER] LAMP_ONE: %d\n", lampOne = switchLamp(true, lampOneHost));
-      }
+      ROS_INFO("Device Entered the Room");
+      //counter_entry++;
+      //if(counter_entry > 0)    {  //se è entrato il primo client nell'area Beacon, accendo la lampada
+          printf("[SERVER] LAMP_ONE: %d\n\n", lampOne = switchLamp(true, lampOneHost));
+      //}
   } else if(msg->data.c_str()[0] == '2')  { //avvicinamento a scrivania
-    printf("[DEBUG] Approach");
+    ROS_INFO("Device Approach the Desk");
     printf("[SERVER] LAMP_ONE: %d\n", lampOne = switchLamp(false, lampOneHost));
     printf("[SERVER] LAMP_TWO: %d\n", lampTwo = switchLamp(true, lampTwoHost));
-  } else if(msg->data.c_str()[0] == '3')  { //allontanamento dalla scrivania
-    printf("[DEBUG] Removal");
+    //printf("[SERVER] TV: %d\n\n", tv = switchLamp(false, tvHost));
+    printf("[SERVER] TV: 0\n\n");
+  } else if(msg->data.c_str()[0] == '3')  { //avvicinamento al divano
+    ROS_INFO("Device Approach the TV");
+    printf("[SERVER] LAMP_ONE: %d\n", lampOne = switchLamp(false, lampOneHost));
+    printf("[SERVER] LAMP_TWO: %d\n", lampTwo = switchLamp(false, lampTwoHost));
+    //printf("[SERVER] TV: %d\n\n", tv = switchLamp(true, tvHost));
+    printf("[SERVER] TV: 1\n\n");
+  } else if(msg->data.c_str()[0] == '4')  { //allontanamento dalla scrivania
+    ROS_INFO("Device Removal the Desk or the Couch");
     printf("[SERVER] LAMP_ONE: %d\n", lampOne = switchLamp(true, lampOneHost));
     printf("[SERVER] LAMP_TWO: %d\n", lampTwo = switchLamp(false, lampTwoHost));
+    //printf("[SERVER] TV: %d\n\n", tv = switchLamp(false, tvHost));
+    printf("[SERVER] TV: 0\n\n");
   } else    {   //uscita del client dall'area Beacon
-      ROS_INFO("Device Exited\n");
-      counter_entry--; 
-      if (counter_entry == 0 && lampOne)   {   //se non ci sono più client nell'area Beacon, spengo la lampada 
-        printf("[SERVER] LAMP_ONE: %d\n", lampOne = switchLamp(false, lampOneHost));
-      }
+      ROS_INFO("Device Exited the Room");
+      //counter_entry--; 
+      //if (counter_entry == 0)   {   //se non ci sono più client nell'area Beacon, spengo la lampada 
+        printf("[SERVER] LAMP_ONE: %d\n\n", lampOne = switchLamp(false, lampOneHost));
+      //}
   }
-  printf("[DEBUG] counter_entry = %d\n", counter_entry);
+  //printf("[DEBUG] counter_entry = %d\n", counter_entry);
 }
 
 
@@ -102,12 +122,11 @@ int main(int argc, char **argv) {
   
   ros::init(argc, argv, "listener");
 
-  ros::NodeHandle n;
-
+  ros::NodeHandle node;
   
-  ros::Subscriber sub = n.subscribe(topicName, 1000, deviceCallback);
+  ros::Subscriber sub = node.subscribe(topicName, 1000, deviceCallback);
 
-  ROS_INFO("[SERVER] Ready to receive clients");
+  ROS_INFO("[SERVER] Ready to receive clients\n");
   ros::spin();
 
   return 0;
