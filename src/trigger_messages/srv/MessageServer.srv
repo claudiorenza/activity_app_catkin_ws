@@ -1,0 +1,4 @@
+bool switch_on
+string device_name
+---
+bool feedback

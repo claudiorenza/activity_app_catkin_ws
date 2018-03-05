@@ -1,0 +1,8 @@
+prefix=/home/kloudpix/catkin_ws/devel
+
+Name: activity_app
+Description: Description of activity_app
+Version: 0.0.0
+Cflags: 
+Libs: -L/home/kloudpix/catkin_ws/devel/lib 
+Requires: 
