@@ -44,6 +44,7 @@ struct MessageServerRequest_
 
 
 
+
   typedef boost::shared_ptr< ::trigger_messages::MessageServerRequest_<ContainerAllocator> > Ptr;
   typedef boost::shared_ptr< ::trigger_messages::MessageServerRequest_<ContainerAllocator> const> ConstPtr;
 

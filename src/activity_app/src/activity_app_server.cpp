@@ -15,10 +15,10 @@
 #include <netdb.h> 
 
 int counter_entry = 0;
-bool lamp = false;
+bool lampOne = false;
+bool lampTwo = false;
 
-
-bool switchLamp(bool to_turn_on)    {
+bool switchLamp(bool to_turn_on, char *host)    {
     int sockfd, portno, n;
 
     struct sockaddr_in serv_addr;
@@ -30,7 +30,7 @@ bool switchLamp(bool to_turn_on)    {
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
     if (sockfd < 0) 
         perror("ERROR opening socket");
-    server = gethostbyname("192.168.1.5");
+    server = gethostbyname(host);
     if (server == NULL) {
         fprintf(stderr,"ERROR, no such host\n");
         exit(0);
@@ -49,10 +49,10 @@ bool switchLamp(bool to_turn_on)    {
     
     if(to_turn_on)  {
         n = write(sockfd,"1",1);
-        ROS_INFO("[SWITCH] The lamp is going ON!");
+        ROS_INFO("[SWITCH] The lampOne is going ON!");
     } else  {
         n = write(sockfd,"0",1);
-        ROS_INFO("[SWITCH] The lamp is going OFF!");
+        ROS_INFO("[SWITCH] The lampOne is going OFF!");
     }
     if (n < 0) 
          perror("ERROR writing to socket");
@@ -69,19 +69,33 @@ bool switchLamp(bool to_turn_on)    {
 }
 
 void deviceCallback(const std_msgs::String::ConstPtr& msg) {
+  char lampOneHost[15];
+  char lampTwoHost[15];
+  strncpy(lampOneHost, "192.168.1.5", 15);
+  strncpy(lampTwoHost, "192.168.1.6", 15);
+
   if(msg->data.c_str()[0] == '1')	{   //entrata del client nell'area Beacon
       ROS_INFO("Device Entered\n");
       counter_entry++;
+      if(counter_entry > 0 && !lampOne)    {  //se è entrato il primo client nell'area Beacon, accendo la lampada
+          printf("[SERVER] LAMP_ONE: %d\n", lampOne = switchLamp(true, lampOneHost));
+      }
+  } else if(msg->data.c_str()[0] == '2')  { //avvicinamento a scrivania
+    printf("[DEBUG] Approach");
+    printf("[SERVER] LAMP_ONE: %d\n", lampOne = switchLamp(false, lampOneHost));
+    printf("[SERVER] LAMP_TWO: %d\n", lampTwo = switchLamp(true, lampTwoHost));
+  } else if(msg->data.c_str()[0] == '3')  { //allontanamento dalla scrivania
+    printf("[DEBUG] Removal");
+    printf("[SERVER] LAMP_ONE: %d\n", lampOne = switchLamp(true, lampOneHost));
+    printf("[SERVER] LAMP_TWO: %d\n", lampTwo = switchLamp(false, lampTwoHost));
   } else    {   //uscita del client dall'area Beacon
       ROS_INFO("Device Exited\n");
       counter_entry--; 
+      if (counter_entry == 0 && lampOne)   {   //se non ci sono più client nell'area Beacon, spengo la lampada 
+        printf("[SERVER] LAMP_ONE: %d\n", lampOne = switchLamp(false, lampOneHost));
+      }
   }
   printf("[DEBUG] counter_entry = %d\n", counter_entry);
-  if(counter_entry > 0 && !lamp)    {  //se è entrato il primo client nell'area Beacon, accendo la lampada
-      printf("[SERVER] LAMP: %d\n", lamp = switchLamp(true));
-  } else if (counter_entry == 0 && lamp)   {   //se non ci sono più client nell'area Beacon, spengo la lampada 
-      printf("[SERVER] LAMP: %d\n", lamp = switchLamp(false));
-  }
 }
 
 

@@ -59,6 +59,7 @@ struct Num_
 
 
 
+
   typedef boost::shared_ptr< ::beginner_tutorials::Num_<ContainerAllocator> > Ptr;
   typedef boost::shared_ptr< ::beginner_tutorials::Num_<ContainerAllocator> const> ConstPtr;
 
