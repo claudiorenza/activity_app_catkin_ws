@@ -71,8 +71,8 @@ bool switchLamp(bool to_turn_on, char *host)    {
 void deviceCallback(const std_msgs::String::ConstPtr& msg) {
   char lampOneHost[15];
   char lampTwoHost[15];
-  strncpy(lampOneHost, "192.168.1.5", 15);
-  strncpy(lampTwoHost, "192.168.1.6", 15);
+  strncpy(lampOneHost, "143.225.85.168", 15);
+  strncpy(lampTwoHost, "143.225.85.169", 15);
 
   if(msg->data.c_str()[0] == '1')	{   //entrata del client nell'area Beacon
       ROS_INFO("Device Entered\n");

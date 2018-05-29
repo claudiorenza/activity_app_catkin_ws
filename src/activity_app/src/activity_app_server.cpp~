@@ -71,7 +71,7 @@ bool switchLamp(bool to_turn_on, char *host)    {
 void deviceCallback(const std_msgs::String::ConstPtr& msg) {
   char lampOneHost[15];
   char lampTwoHost[15];
-  strncpy(lampOneHost, "192.168.1.5", 15);
+  strncpy(lampOneHost, "143.225.85.168", 15);
   strncpy(lampTwoHost, "192.168.1.6", 15);
 
   if(msg->data.c_str()[0] == '1')	{   //entrata del client nell'area Beacon
@@ -81,11 +81,11 @@ void deviceCallback(const std_msgs::String::ConstPtr& msg) {
           printf("[SERVER] LAMP_ONE: %d\n", lampOne = switchLamp(true, lampOneHost));
       }
   } else if(msg->data.c_str()[0] == '2')  { //avvicinamento a scrivania
-    printf("[DEBUG] Avvicinamento");
+    printf("[DEBUG] Approach");
     printf("[SERVER] LAMP_ONE: %d\n", lampOne = switchLamp(false, lampOneHost));
     printf("[SERVER] LAMP_TWO: %d\n", lampTwo = switchLamp(true, lampTwoHost));
   } else if(msg->data.c_str()[0] == '3')  { //allontanamento dalla scrivania
-    printf("[DEBUG] Allontanamento");
+    printf("[DEBUG] Removal");
     printf("[SERVER] LAMP_ONE: %d\n", lampOne = switchLamp(true, lampOneHost));
     printf("[SERVER] LAMP_TWO: %d\n", lampTwo = switchLamp(false, lampTwoHost));
   } else    {   //uscita del client dall'area Beacon
