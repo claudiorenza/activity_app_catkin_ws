@@ -49,10 +49,10 @@ bool switchLamp(bool to_turn_on, char *host)    {
     
     if(to_turn_on)  {
         n = write(sockfd,"1",1);
-        ROS_INFO("[SWITCH] The lampOne is going ON!");
+        ROS_INFO("[SWITCH] The lamp is going ON!");
     } else  {
         n = write(sockfd,"0",1);
-        ROS_INFO("[SWITCH] The lampOne is going OFF!");
+        ROS_INFO("[SWITCH] The lamp is going OFF!");
     }
     if (n < 0) 
          perror("ERROR writing to socket");
@@ -69,11 +69,9 @@ bool switchLamp(bool to_turn_on, char *host)    {
 }
 
 void deviceCallback(const std_msgs::String::ConstPtr& msg) {
-  char lampOneHost[15];
-  char lampTwoHost[15];
-  strncpy(lampOneHost, "143.225.85.168", 15);
-  strncpy(lampTwoHost, "143.225.85.169", 15);
-
+  char lampOneHost[] = "143.225.85.168";
+  char lampTwoHost[] = "143.225.85.169";
+  
   if(msg->data.c_str()[0] == '1')	{   //entrata del client nell'area Beacon
       ROS_INFO("Device Entered\n");
       counter_entry++;
@@ -100,12 +98,14 @@ void deviceCallback(const std_msgs::String::ConstPtr& msg) {
 
 
 int main(int argc, char **argv) {  
+  char topicName[] = "recogniser";
+  
   ros::init(argc, argv, "listener");
 
   ros::NodeHandle n;
 
   
-  ros::Subscriber sub = n.subscribe("recogniser", 1000, deviceCallback);
+  ros::Subscriber sub = n.subscribe(topicName, 1000, deviceCallback);
 
   ROS_INFO("[SERVER] Ready to receive clients");
   ros::spin();
