@@ -90,8 +90,8 @@ void deviceCallback(const std_msgs::String::ConstPtr& msg) {
       //}
   } else if(msg->data.c_str()[0] == '2')  { //avvicinamento a scrivania
     ROS_INFO("Device Approach the Desk");
-    printf("[SERVER] LAMP_ONE: %d\n", lampOne = switchLamp(false, lampOneHost));
     printf("[SERVER] LAMP_TWO: %d\n", lampTwo = switchLamp(true, lampTwoHost));
+    printf("[SERVER] LAMP_ONE: %d\n", lampOne = switchLamp(false, lampOneHost));
     //printf("[SERVER] TV: %d\n\n", tv = switchLamp(false, tvHost));
     printf("[SERVER] TV: 0\n\n");
   } else if(msg->data.c_str()[0] == '3')  { //avvicinamento al divano

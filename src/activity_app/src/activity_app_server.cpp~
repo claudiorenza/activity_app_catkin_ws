@@ -100,7 +100,7 @@ void deviceCallback(const std_msgs::String::ConstPtr& msg) {
     printf("[SERVER] LAMP_TWO: %d\n", lampTwo = switchLamp(false, lampTwoHost));
     //printf("[SERVER] TV: %d\n\n", tv = switchLamp(true, tvHost));
     printf("[SERVER] TV: 1\n\n");
-  } else if(msg->data.c_str()[0] == '-1')  { //allontanamento dalla scrivania
+  } else if(msg->data.c_str()[0] == '4')  { //allontanamento dalla scrivania
     ROS_INFO("Device Removal the Desk or the Couch");
     printf("[SERVER] LAMP_ONE: %d\n", lampOne = switchLamp(true, lampOneHost));
     printf("[SERVER] LAMP_TWO: %d\n", lampTwo = switchLamp(false, lampTwoHost));
